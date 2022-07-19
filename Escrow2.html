@@ -1,0 +1,198 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONNECTION TO METAMASK</title>
+
+ <!-- jquery -->
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+ <!-- web3 -->
+ <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+ 
+         <!-- Fonts -->
+         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+ 
+         <!-- Styles -->
+
+    <style>
+        body {
+            background-color: palevioletred;
+            font-size: 33px;
+            text-align: center;
+        }
+
+        button {
+            background-color: aquamarine;
+            font-size: 33px;
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        }
+
+        button:hover {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<br>
+    
+
+
+
+<button onclick="connectToMetamask()">CONNECTED TO METAMASK</button> </br>
+<p id="accountArea"></p>
+
+<button onclick="connectToContract()">CONNECTED TO SMART CONTRACT</button> </br>
+<p id="contractArea"></p>
+
+<button onclick="readData()">GET DATA FROM CONTRACT</button> </br>
+<p id="datatArea"></p>
+
+
+<!--<input type="text" id="userInputArgument" >  -->          
+  <!-- Here we take user input & stored it in id ="userInputArgument"-->
+
+<button type="button"  onclick="callMethodOne( );"> confirmPayment </button> </br>      
+<!--Here on clicking button mOne a javascript function callMethodOne( ) will be called -->
+<h3>Current State</h3> </br>
+<p id="state"></p></br></br></br>
+<h3>Escrow Balance</h3>
+<p id="balance"></p>
+
+
+
+
+    <script>
+
+//connect to metamask
+
+let account;
+const connectToMetamask = async () => {
+    if (window.ethereum !== "undefined") {
+        const accounts = await ethereum.request({method: "eth_requestAccounts"});
+        account = accounts[0];
+        document.getElementById("accountArea").innerHTML = account;
+    }
+}
+
+
+//connect to smart contract
+
+const connectToContract = async () => {
+    const ABI = [
+	{
+		"inputs": [],
+		"name": "confirmDelivery",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "confirmPayment",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_buyer",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_seller",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "buyer",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "currentState",
+		"outputs": [
+			{
+				"internalType": "enum Escrow.State",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getBalance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+    const Address = "0xE47bc87197C27b1d30E2a9E939B8c75d3c9497F0";
+    window.web3 = await new Web3(window.ethereum);
+    window.contract = await new window.web3.eth.Contract(ABI, Address);
+    document.getElementById("contractArea").innerHTML = "Connected to smart contract";
+}
+
+
+const readData = async () => {
+    const data = await window.contract.methods.buyer().call();
+    document.getElementById("datatArea").innerHTML = data;
+}
+
+
+
+
+
+
+     async function callMethodOne( )
+{
+         // var amtA = 0;
+
+          //We stored the valued captured by input field through id ="userInputArgument" inside a variable "amtA"
+        //  amtA = $('#userInputArgument').val( );    
+                                             
+         web3.eth.getAccounts().then(function(accountsA){
+              var accA = accountsA[0];
+
+              //Here we call the smart contract method that we defined earlier methodOne(userInputArgument)
+             // return contract.methods.confirmPayment(amtA).send({from:accA});   
+
+             return contract.methods.confirmPayment().send({from:accA}); 
+
+                            
+          })
+
+          const _currentState = await window.contract.methods.currentState().call();
+    document.getElementById("state").innerHTML =  _currentState;
+
+    const _getBalance = await window.contract.methods.getBalance().call();
+    document.getElementById("balance").innerHTML =  _getBalance;
+
+ } 
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Escrow </title>
+
+        <!-- jquery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+<!-- web3 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.4.0/web3.min.js"></script>
+
+        <!-- Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+        <!-- Styles -->
+        <style>
+         </style>
+
+        <style>
+            body {
+                font-family: 'Nunito', sans-serif;
+            }
+        </style>
+
+
+<script type="text/javascript">
+    async function loadweb3(){
+        if(window.ethereum){
+            window.web3=new Web3(window.ethereum);
+            window.ethereum.enable(); 
+        } 
+    }        
+       
+     async function loadContract(){
+          //ABI & address of owner who deployed it on metamask network in RemixIDE
+       // var ABI = ///Copy paste your Smart Contract ABI
+        var ABI = [
+	{
+		"inputs": [],
+		"name": "confirmDelivery",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "confirmPayment",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_buyer",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_seller",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "buyer",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "currentState",
+		"outputs": [
+			{
+				"internalType": "enum Escrow.State",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getBalance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+        var Address = '0xe47bc87197c27b1d30e2a9e939b8c75d3c9497f0';
+          return await new window.web3.eth.Contract( ABI, Address); 
+      } 
+      
+        
+      async function load(){
+            await loadweb3();
+         window.contract = await loadContract();
+        }
+         
+      
+    load();  
+      
+</script>
+
+    </head>
+    <body class="antialiased">
+
+       
+     ///////////////////////// Interact with smart contract methods which takes user input and shows output /////////////////////
+
+<input type="text" id="userInputArgument" >                                                 //Here we take user input & stored it in id ="userInputArgument"
+<button type="button"  onclick="callMethodOne( );"> mOne </button>       //Here on clicking button mOne a javascript function callMethodOne( ) will be called
+<script>
+     async function callMethodOne( )
+{
+          var amtA = 0;
+
+          //We stored the valued captured by input field through id ="userInputArgument" inside a variable "amtA"
+          amtA = $('#userInputArgument').val( );    
+                                             
+          web3.eth.getAccounts().then(function(accountsA){
+              var accA = accountsA[0];
+
+              //Here we call the smart contract method that we defined earlier methodOne(userInputArgument)
+              return contract.methods.methodOne(amtA).send({from:accA});                                         
+
+                            
+          })
+ } 
+
+
+</script>
+///////////////////////// Interact with smart contract methods which only shows output without taking any input /////////////////////
+
+<button type="button"  onclick="callGetBalance( );"> getBalance </button>     //Here on clicking button "mTwo" a javascript function callMethodTwo( ) will be called
+
+<script>
+ async function callGetBalance( ){
+
+           //Here we call the smart contract method that we defined earlier methodTwo( )
+         const amtB = await window.contract.methods.getBalance( ).call();                   
+         
+      }
+
+</script>
+         
+    </body>
+</html>
